@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, redirect, url_for, flash, abort
+import smtplib
+from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
@@ -10,6 +11,10 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
+
+
+gmail_user = os.environ.get('EMAIL')
+password_one = os.environ.get('PASSWORD')
 
 
 app = Flask(__name__)
@@ -217,6 +222,22 @@ def edit_post(post_id):
         return redirect(url_for("show_post", post_id=post.id))
 
     return render_template("make-post.html", form=edit_form, logg_in=current_user.is_authenticated)
+
+
+@app.route("/contact.html", methods=['GET', 'POST'])
+def contact_it():
+    if request.method == 'POST':
+        data_for_it = request.form
+        with smtplib.SMTP("SMTP.mail.ru") as data_sms:
+            data_sms.starttls()
+            data_sms.login(gmail_user, password_one)
+            data_sms.sendmail(from_addr=gmail_user,
+                              to_addrs="asanbekovmaksat@yahoo.com",
+                              msg=f"Subject: Email from {data_for_it['name']}\n\n{data_for_it['message']}\n"
+                                  f"Email: {data_for_it['email']}\nPhone: {data_for_it['phone']} ")
+        return render_template("contact.html", msg_sent=True)
+    else:
+        return render_template("contact.html", msg_sent=False)
 
 
 @app.route("/delete/<int:post_id>")
