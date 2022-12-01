@@ -175,7 +175,7 @@ def show_post(post_id):
 
 @app.route("/about")
 def about():
-    return render_template("about.html")
+    return render_template("about.html", logg_in=current_user.is_authenticated)
 
 
 @app.route("/contact")
@@ -235,9 +235,9 @@ def contact_it():
                               to_addrs="asanbekovmaksat@yahoo.com",
                               msg=f"Subject: Email from {data_for_it['name']}\n\n{data_for_it['message']}\n"
                                   f"Email: {data_for_it['email']}\nPhone: {data_for_it['phone']} ")
-        return render_template("contact.html", msg_sent=True)
+        return render_template("contact.html", msg_sent=True, logg_in=current_user.is_authenticated)
     else:
-        return render_template("contact.html", msg_sent=False)
+        return render_template("contact.html", msg_sent=False, logg_in=current_user.is_authenticated)
 
 
 @app.route("/delete/<int:post_id>")
